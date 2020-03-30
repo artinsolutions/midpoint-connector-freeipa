@@ -1,4 +1,4 @@
-# midpoint-connector-freeipa
+# connector-freeipa
 
 Polygon/ConnId connector for FreeIPA
 
@@ -31,7 +31,7 @@ After successful the build, you can find `connector-freeipa-1.0.0.0.jar` in `tar
 
 * create user in FreeIPA
 * set membership to user groups: ipausers, trust admins, admins 
-* inspire by [sample](https://github.com/artinsolutions/midpoint-connector-freeipa/sample) to configure your own resource
+* inspire by [sample](https://github.com/artinsolutions/midpoint-connector-freeipa/tree/master/sample) to configure your own resource
 
 ## License
 
