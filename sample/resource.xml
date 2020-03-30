@@ -1,0 +1,460 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+
+ ~ Copyright (c) ARTIN solutions
+ ~
+ ~ Licensed under the Apache License, Version 2.0 (the "License");
+ ~ you may not use this file except in compliance with the License.
+ ~ You may obtain a copy of the License at
+ ~
+ ~     http://www.apache.org/licenses/LICENSE-2.0
+ ~
+ ~ Unless required by applicable law or agreed to in writing, software
+ ~ distributed under the License is distributed on an "AS IS" BASIS,
+ ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ ~ See the License for the specific language governing permissions and
+ ~ limitations under the License.
+ 
+-->
+<resource xmlns="http://midpoint.evolveum.com/xml/ns/public/common/common-3" xmlns:c="http://midpoint.evolveum.com/xml/ns/public/common/common-3" xmlns:icfs="http://midpoint.evolveum.com/xml/ns/public/connector/icf-1/resource-schema-3" xmlns:org="http://midpoint.evolveum.com/xml/ns/public/common/org-3" xmlns:q="http://prism.evolveum.com/xml/ns/public/query-3" xmlns:ri="http://midpoint.evolveum.com/xml/ns/public/resource/instance-3" xmlns:t="http://prism.evolveum.com/xml/ns/public/types-3" 
+		oid="3aed4e27-1b97-41fe-ba68-18225f274721">
+    <name>FreeIPA</name>
+
+    <connectorRef relation="org:default" type="c:ConnectorType">
+		<filter>
+			<q:equal>
+				<q:path>c:connectorType</q:path>
+				<q:value>io.artin.idm.connector.freeipa.FreeIpaConnector</q:value>
+			</q:equal>
+		</filter>
+    </connectorRef>
+    <connectorConfiguration xmlns:icfc="http://midpoint.evolveum.com/xml/ns/public/connector/icf-1/connector-schema-3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:c="http://midpoint.evolveum.com/xml/ns/public/common/common-3" xsi:type="c:ConnectorConfigurationType">
+        <icfc:configurationProperties xmlns:gen408="http://midpoint.evolveum.com/xml/ns/public/connector/icf-1/bundle/com.evolveum.polygon.connector-freeipa/io.artin.idm.connector.freeipa.FreeIpaConnector" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="icfc:ConfigurationPropertiesType">
+            <gen408:trustAllCertificates>true</gen408:trustAllCertificates>
+            <gen408:password>
+            	<clearValue>$(ipa.password)</clearValue>
+			</gen408:password>            	
+            <gen408:serviceAddress>$(ipa.serviceAddress)</gen408:serviceAddress>
+            <gen408:authMethod>NONE</gen408:authMethod>
+            <gen408:username>$(ipa.username)</gen408:username>
+        </icfc:configurationProperties>
+    </connectorConfiguration>
+    <schemaHandling>
+        <objectType id="3">
+            <kind>account</kind>
+            <intent>default</intent>
+            <default>true</default>
+            <objectClass>ri:user</objectClass>
+            <attribute>
+                <c:ref xmlns:icfs="http://midpoint.evolveum.com/xml/ns/public/connector/icf-1/resource-schema-3">icfs:name</c:ref>
+                <outbound>
+                    <strength>strong</strength>
+                    <source>
+                        <c:path>name</c:path>
+                    </source>
+                </outbound>
+            </attribute>
+            <attribute>
+                <c:ref xmlns:ri="http://midpoint.evolveum.com/xml/ns/public/resource/instance-3">ri:cn</c:ref>
+                <outbound>
+                    <strength>strong</strength>
+                    <source>
+                        <c:path>fullName</c:path>
+                    </source>
+                </outbound>
+            </attribute>
+            <attribute>
+                <c:ref xmlns:ri="http://midpoint.evolveum.com/xml/ns/public/resource/instance-3">ri:sn</c:ref>
+                <outbound>
+                    <strength>strong</strength>
+                    <source>
+                        <c:path>familyName</c:path>
+                    </source>
+			      	<expression>
+			        	<script>
+			            	<code>
+			            		// "error": "Leading and trailing spaces are not allowed"
+			            		return basic.trim(basic.stringify(familyName));	
+			            	</code>
+			        	</script>
+			      	</expression>
+                </outbound>
+            </attribute>
+            <attribute>
+                <ref>ri:givenname</ref>
+                <outbound>
+                    <strength>strong</strength>
+                    <source>
+                        <c:path>givenName</c:path>
+                    </source>
+                </outbound>
+            </attribute>
+            <attribute>
+                <ref>ri:mail</ref>
+				<tolerant>false</tolerant>
+                <outbound>
+                    <strength>strong</strength>
+                    <source>
+                        <c:path>emailAddress</c:path>
+                    </source>
+                </outbound>
+            </attribute>            
+
+            <attribute>
+                <ref>ri:telephonenumber</ref>
+                <outbound>
+                    <strength>strong</strength>
+                    <source>
+                        <c:path>telephoneNumber</c:path>
+                    </source>
+                </outbound>
+            </attribute>
+            <attribute>
+                <ref>ri:employeenumber</ref>
+                <outbound>
+                    <strength>strong</strength>
+                    <source>
+                        <c:path>employeeNumber</c:path>
+                    </source>
+                </outbound>
+            </attribute>
+            <attribute>
+                <ref>ri:uidnumber</ref>
+                <outbound>
+                    <strength>strong</strength>
+                    <source>
+                        <c:path>employeeNumber</c:path>
+                    </source>
+                </outbound>
+            </attribute>
+            <!-- 
+            <attribute>
+                <ref>ri:mobile</ref>
+                <outbound>
+                    <strength>strong</strength>
+                    <source>
+                        <c:path>extension/mobile</c:path>
+                    </source>
+                </outbound>
+            </attribute>
+            <attribute>
+                <ref>ri:street</ref>
+                <outbound>
+                    <strength>strong</strength>
+                    <source>
+                        <c:path>extension/streetAddress</c:path>
+                    </source>
+                </outbound>
+            </attribute>
+            <attribute>
+                <ref>ri:l</ref>
+                <outbound>
+                    <strength>strong</strength>
+                    <source>
+                        <c:path>extension/city</c:path>
+                    </source>
+                </outbound>
+            </attribute>
+            <attribute>
+                <ref>ri:st</ref>
+                <outbound>
+                    <strength>strong</strength>
+                    <source>
+                        <c:path>extension/country</c:path>
+                    </source>
+                </outbound>
+            </attribute>
+            <attribute>
+                <ref>ri:postalcode</ref>
+                <outbound>
+                    <strength>strong</strength>
+                    <source>
+                        <c:path>extension/postalCode</c:path>
+                    </source>
+                </outbound>
+            </attribute> -->
+            <attribute>
+                <ref>ri:employeetype</ref>
+                <outbound>
+                    <strength>strong</strength>
+                    <source>
+                        <c:path>subtype</c:path>
+                    </source>
+                </outbound>
+            </attribute>
+            <attribute>
+                <ref>ri:preferredlanguage</ref>
+                <outbound>
+                    <strength>strong</strength>
+                    <source>
+                        <c:path>preferredLanguage</c:path>
+                    </source>
+                </outbound>
+            </attribute>
+			<attribute>
+				<ref>ri:gidnumber</ref>
+				<outbound>
+					<strength>strong</strength>
+					<expression>
+						<script>
+							<code>
+								return '840499999'; // some default
+							</code>
+						</script>
+					</expression>
+				</outbound>
+			</attribute>            
+            
+            <attribute>
+                <c:ref xmlns:ri="http://midpoint.evolveum.com/xml/ns/public/resource/instance-3">ri:nsaccountlock</c:ref>
+                <outbound>
+                    <strength>strong</strength>
+                    <source>
+                        <c:path>activation/effectiveStatus</c:path>
+                    </source>
+                    <expression>
+                        <script xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:c="http://midpoint.evolveum.com/xml/ns/public/common/common-3" xsi:type="c:ScriptExpressionEvaluatorType">
+                            <code>
+                               if (effectiveStatus==null || effectiveStatus.value() == 'enabled') {
+                                 return false; // by design undefined = enabled
+                               }
+                               else
+                                 return true;
+                            </code>
+                        </script>
+                    </expression>
+                </outbound>
+            </attribute>
+            
+			<activation>
+				<existence>
+	                <outbound>
+	                    <strength>weak</strength>
+	                    <expression>
+	                        <path>$focusExists</path>
+	                    </expression>
+	                </outbound>
+	             </existence>						
+			</activation>
+            
+            <attribute>
+                <c:ref xmlns:ri="http://midpoint.evolveum.com/xml/ns/public/resource/instance-3">ri:krbpasswordexpiration</c:ref>
+                <outbound>
+                    <strength>strong</strength>
+                    <source>
+                        <c:path>credentials/password/metadata/createTimestamp</c:path>
+                    </source>
+                    <source>
+                        <c:path>credentials/password/metadata/modifyTimestamp</c:path>
+                    </source>
+                    <expression>
+                        <script xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:c="http://midpoint.evolveum.com/xml/ns/public/common/common-3" xsi:type="c:ScriptExpressionEvaluatorType">
+                            <code>
+								import java.text.SimpleDateFormat;
+			                    import java.text.DateFormat;
+			                    
+                            	passwordLastChange = modifyTimestamp==null ? createTimestamp : modifyTimestamp;
+                            	
+                            	if (passwordLastChange==null) {
+                            		return null;
+                            	}
+                            	// else password is set
+                            	
+			                    Calendar c = Calendar.getInstance(); 
+			                    c.setTime(passwordLastChange.toGregorianCalendar().getTime()); 
+			                    c.add(Calendar.YEAR, 1);	// password expires after 1 year in kerberos
+			                    
+			                    DateFormat df = new SimpleDateFormat("yyyyMMddHHmmss");
+			                    
+			                    ret = df.format(c.getTime())+"Z";
+			                    
+                               	return ret;
+                            </code>
+                        </script>
+                    </expression>
+                </outbound>
+            </attribute>
+            
+            <association>
+                <c:ref xmlns:ri="http://midpoint.evolveum.com/xml/ns/public/resource/instance-3">ri:roles</c:ref>
+                <displayName>IPA Role Membership</displayName>
+                <kind>entitlement</kind>
+                <intent>role</intent>
+                <direction>subjectToObject</direction>
+                <associationAttribute>ri:memberof_role</associationAttribute>
+                <valueAttribute>icfs:uid</valueAttribute>
+            </association>
+            <association>
+                <c:ref xmlns:ri="http://midpoint.evolveum.com/xml/ns/public/resource/instance-3">ri:groups</c:ref>
+                <displayName>IPA Group Membership</displayName>
+                <kind>entitlement</kind>
+                <intent>group</intent>
+                <direction>subjectToObject</direction>
+                <associationAttribute>ri:memberof_group</associationAttribute>
+                <valueAttribute>icfs:uid</valueAttribute>
+            </association>
+            <credentials>
+                <password xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:c="http://midpoint.evolveum.com/xml/ns/public/common/common-3" xsi:type="c:ResourcePasswordDefinitionType">
+                    <outbound>
+                        <expression>
+                            <asIs xmlns:c="http://midpoint.evolveum.com/xml/ns/public/common/common-3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="c:AsIsExpressionEvaluatorType"/>
+                        </expression>
+                    </outbound>
+                </password>
+            </credentials>
+
+            <protected>
+                <filter>
+                    <q:equal>
+                        <q:path>declare namespace icfs="http://midpoint.evolveum.com/xml/ns/public/connector/icf-1/resource-schema-3";
+                                attributes/icfs:name</q:path>
+                        <q:value>admin</q:value>
+                    </q:equal>
+                </filter>
+            </protected>            
+            <protected>
+                <filter>
+                    <q:equal>
+                        <q:path>declare namespace icfs="http://midpoint.evolveum.com/xml/ns/public/connector/icf-1/resource-schema-3";
+                                attributes/icfs:name</q:path>
+                        <q:value>$(ipa.username)</q:value>
+                    </q:equal>
+                </filter>
+            </protected>            
+        </objectType>
+ 
+        <objectType id="4">
+            <kind>entitlement</kind>
+            <intent>role</intent>
+            <default>false</default>
+            <objectClass>ri:role</objectClass>
+            <attribute id="9">
+                <c:ref xmlns:ri="http://midpoint.evolveum.com/xml/ns/public/resource/instance-3">ri:description</c:ref>
+                <tolerant>true</tolerant>
+                <outbound>
+                    <strength>strong</strength>
+                    <source>
+                        <c:path>description</c:path>
+                    </source>
+                </outbound>
+            </attribute>
+            <attribute id="11">
+                <c:ref xmlns:icfs="http://midpoint.evolveum.com/xml/ns/public/connector/icf-1/resource-schema-3">icfs:name</c:ref>
+                <tolerant>true</tolerant>
+                <outbound>
+                    <strength>strong</strength>
+                    <source>
+                        <c:path>name</c:path>
+                    </source>
+                </outbound>
+            </attribute>
+        </objectType>
+        
+        <objectType id="5">
+            <kind>entitlement</kind>
+            <intent>group</intent>
+            <default>false</default>
+            <objectClass>ri:group</objectClass>
+            <attribute id="9">
+                <c:ref xmlns:ri="http://midpoint.evolveum.com/xml/ns/public/resource/instance-3">ri:description</c:ref>
+                <tolerant>true</tolerant>
+                <outbound>
+                    <strength>strong</strength>
+                    <source>
+                        <c:path>description</c:path>
+                    </source>
+                </outbound>
+            </attribute>
+            <attribute id="11">
+                <c:ref xmlns:icfs="http://midpoint.evolveum.com/xml/ns/public/connector/icf-1/resource-schema-3">icfs:name</c:ref>
+                <tolerant>true</tolerant>
+                <outbound>
+                    <strength>strong</strength>
+                    <source>
+                        <c:path>name</c:path>
+                    </source>
+                </outbound>
+            </attribute>
+        </objectType>
+    </schemaHandling>
+    
+    <synchronization>
+ 		<objectSynchronization>
+	         <name>Account sync</name>
+	         <kind>account</kind>
+	         <intent>default</intent>
+	         <objectClass>ri:user</objectClass>
+	         <focusType>UserType</focusType>
+	         <enabled>true</enabled>
+	         <correlation>
+	            <q:equal>
+	               <q:path>c:name</q:path>
+	               <expression>
+	                  <path>$shadow/attributes/icfs:name</path>
+	               </expression>
+	            </q:equal>
+	         </correlation>
+	         <reaction>
+	            <situation>linked</situation>
+	            <synchronize>true</synchronize>
+	         </reaction>
+	         <reaction>
+	            <situation>deleted</situation>
+	            <action>
+                    <handlerUri>http://midpoint.evolveum.com/xml/ns/public/model/action-3#inactivateShadow</handlerUri>
+                </action>
+	         </reaction>
+	         <reaction>
+	            <situation>unlinked</situation>
+	            <action>
+                    <handlerUri>http://midpoint.evolveum.com/xml/ns/public/model/action-3#link</handlerUri>
+                </action>
+	         </reaction>
+	         <reaction>
+	            <situation>unmatched</situation>
+	         </reaction>
+      	</objectSynchronization>
+      	
+		<objectSynchronization>
+			<name>Group sync</name>
+            <kind>entitlement</kind>
+            <intent>group</intent>
+            <objectClass>ri:group</objectClass>
+			<focusType>RoleType</focusType>
+			<enabled>true</enabled>
+			<correlation>
+				<q:equal>
+					<q:path>c:name</q:path>
+					<expression>
+						<path>$shadow/attributes/icfs:name</path>
+					</expression>
+				</q:equal>
+			</correlation>
+
+			<reaction>
+				<situation>linked</situation>
+				<synchronize>true</synchronize>
+			</reaction>
+			<reaction>
+				<situation>deleted</situation>
+	            <action>
+                    <handlerUri>http://midpoint.evolveum.com/xml/ns/public/model/action-3#unlink</handlerUri>
+                </action>
+			</reaction>
+			<reaction>
+				<situation>unlinked</situation>
+	            <action>
+                    <handlerUri>http://midpoint.evolveum.com/xml/ns/public/model/action-3#link</handlerUri>
+                </action>
+			</reaction>
+			<reaction>
+				<situation>unmatched</situation>
+	            <action>
+                    <handlerUri>http://midpoint.evolveum.com/xml/ns/public/model/action-3#addFocus</handlerUri>
+                </action>
+			</reaction>
+
+		</objectSynchronization>      	
+    
+    </synchronization>
+</resource>
