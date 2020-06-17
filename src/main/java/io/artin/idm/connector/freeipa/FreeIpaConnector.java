@@ -108,6 +108,9 @@ public class FreeIpaConnector extends AbstractRestConnector<FreeIpaConfiguration
 	public static final String ATTR_IPANTSECURITYIDENTIFIER = "ipantsecurityidentifier";
 	public static final String ATTR_KRBTICKETFLAGS = "krbticketflags";
 	
+	public static final String ATTR_IPANTHASH = "ipanthash"; // freeradius
+	
+	
 	public static final String ATTR_NOPRIVATE = "noprivate";
 	public static final String ATTR_GIDNUMBER = "gidnumber";
 	
@@ -282,6 +285,9 @@ public class FreeIpaConnector extends AbstractRestConnector<FreeIpaConfiguration
 
 	        AttributeInfoBuilder attrNoPrivateBuilder = new AttributeInfoBuilder(ATTR_NOPRIVATE); // missing from schema (workaround)
 	        objClassBuilder.addAttributeInfo(attrNoPrivateBuilder.build());
+
+			AttributeInfoBuilder attrIpaNtHashBuilder = new AttributeInfoBuilder(ATTR_IPANTHASH); // missing from schema (workaround)
+	        objClassBuilder.addAttributeInfo(attrIpaNtHashBuilder.build());
 		}
 		
 		if (OBJECT_CLASS_GROUP.equals(className)) {
