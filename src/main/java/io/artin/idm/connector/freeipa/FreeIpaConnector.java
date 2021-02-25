@@ -16,22 +16,31 @@
 package io.artin.idm.connector.freeipa;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.net.URISyntaxException;
 
+import org.apache.http.client.CookieStore;
 import org.apache.http.NameValuePair;
 import org.apache.http.ParseException;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.BasicCookieStore;
+import org.apache.http.impl.cookie.BasicClientCookie;
+
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.apache.http.client.methods.HttpUriRequest;
+
 import org.identityconnectors.common.StringUtil;
 import org.identityconnectors.common.logging.Log;
 import org.identityconnectors.common.security.GuardedString;
@@ -111,6 +120,9 @@ public class FreeIpaConnector extends AbstractRestConnector<FreeIpaConfiguration
 	public static final String ATTR_IPANTHASH = "ipanthash"; // freeradius
 	
 	
+
+    public static String COOKIE_VALUE = null;
+
 	public static final String ATTR_NOPRIVATE = "noprivate";
 	public static final String ATTR_GIDNUMBER = "gidnumber";
 	
@@ -131,12 +143,39 @@ public class FreeIpaConnector extends AbstractRestConnector<FreeIpaConfiguration
     public void init(Configuration configuration) {
         LOG.info("Initializing {0} connector instance {1}", this.getClass().getSimpleName(), this);
     	super.init(configuration);
-        
-    	// log in as post over HTTPS, Password Authentication see: https://vda.li/en/posts/2015/05/28/talking-to-freeipa-api-with-sessions/
-    	CloseableHttpClient client = getHttpClient();
-    	
-    	final List<String> passwordList = new ArrayList<String>(1);
+        // log in as post over HTTPS, Password Authentication see: https://vda.li/en/posts/2015/05/28/talking-to-freeipa-api-with-sessions/
+    }
+
+    @Override
+    public CloseableHttpResponse execute(HttpUriRequest request) {
+        try{
+            BasicCookieStore cookieStore = new BasicCookieStore();
+            BasicClientCookie cookie = new BasicClientCookie("ipa_session", COOKIE_VALUE);
+            URI uri = new URI(getConfiguration().getServiceAddress());
+            cookie.setDomain(uri.getHost());
+            cookie.setPath(uri.getPath());
+            cookieStore.addCookie(cookie);
+
+            HttpClientContext context = HttpClientContext.create();
+            context.setAttribute(HttpClientContext.COOKIE_STORE, cookieStore);
+
+            return getHttpClient().execute(request,context);
+        } catch (IOException e) {
+            throw new ConnectorIOException(e.getMessage(), e);
+        } catch (URISyntaxException e){
+            throw new ConnectorException(e.getMessage(), e);
+        }
+    }
+
+    protected boolean login() {
+        boolean result = false;
+
+        // log in as post over HTTPS, Password Authentication see: https://vda.li/en/posts/2015/05/28/talking-to-freeipa-api-with-sessions/
+        CloseableHttpClient client = getHttpClient();
+
+        final List<String> passwordList = new ArrayList<String>(1);
         GuardedString guardedPassword = getConfiguration().getPassword();
+
         if (guardedPassword != null) {
             guardedPassword.access(new GuardedString.Accessor() {
                 @Override
@@ -152,23 +191,27 @@ public class FreeIpaConnector extends AbstractRestConnector<FreeIpaConfiguration
         
         // log in
         HttpPost httpPost = new HttpPost(getConfiguration().getServiceAddress()+"/session/login_password");
-     
+
+        HttpClientContext context = HttpClientContext.create();
+
         List<NameValuePair> params = new ArrayList<NameValuePair>();
         params.add(new BasicNameValuePair("user", getConfiguration().getUsername()));
         params.add(new BasicNameValuePair("password", password));
         CloseableHttpResponse response;
         try {
-			httpPost.setEntity(new UrlEncodedFormEntity(params));
-			response = client.execute(httpPost);
-	        System.out.println("Response is: "+response);        
-			LOG.info("Connector instance created, authnetication result is {0}", response);
-		} catch (UnsupportedEncodingException e) {
-			LOG.error("cannot log in to freeIPA: " + e, e);
-			throw new ConnectorIOException(e.getMessage(), e);
-		} catch (IOException e) {
-			LOG.error("cannot log in to freeIPA: " + e, e);
-			throw new ConnectorIOException(e.getMessage(), e);
-		}
+            httpPost.setEntity(new UrlEncodedFormEntity(params));
+            response = client.execute(httpPost,context);
+            COOKIE_VALUE=context.getCookieStore().getCookies().get(0).getValue();
+            result=true;
+            LOG.info("Connector instance created, authnetication result is {0}", response);
+        } catch (UnsupportedEncodingException e) {
+            LOG.error("cannot log in to freeIPA: " + e, e);
+            throw new ConnectorIOException(e.getMessage(), e);
+        } catch (IOException e) {
+            LOG.error("cannot log in to freeIPA: " + e, e);
+            throw new ConnectorIOException(e.getMessage(), e);
+        }
+        return result;
     }
 		
     @Override
@@ -340,7 +383,15 @@ public class FreeIpaConnector extends AbstractRestConnector<FreeIpaConfiguration
         StringEntity entity = new StringEntity( jo.toString(), ContentType.APPLICATION_JSON);
         request.setEntity(entity);
         CloseableHttpResponse response = execute(request);
-        LOG.ok("response: \n{0}", response);
+        if (response.getStatusLine().getStatusCode()==401){
+            LOG.warn("401 - no cookie detected need to connect");
+            boolean logged= login();
+            if (logged){
+                closeResponse(response);
+                response = execute(request);
+            }
+        }
+        LOG.warn("response: \n{0}", response);
 
         String result;
 		try {
