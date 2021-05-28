@@ -116,6 +116,7 @@ public class FreeIpaConnector extends AbstractRestConnector<FreeIpaConfiguration
 	public static final String ATTR_KRBLASTFAILEDAUTH = "krblastfailedauth";
 	public static final String ATTR_IPANTSECURITYIDENTIFIER = "ipantsecurityidentifier";
 	public static final String ATTR_KRBTICKETFLAGS = "krbticketflags";
+	public static final String ATTR_KRBLASTADMINUNLOCK = "krblastadminunlock";
 	
 	public static final String ATTR_IPANTHASH = "ipanthash"; // freeradius
 	
@@ -325,6 +326,9 @@ public class FreeIpaConnector extends AbstractRestConnector<FreeIpaConfiguration
 
 			AttributeInfoBuilder attrKrbTicketFlagsBuilder = new AttributeInfoBuilder(ATTR_KRBTICKETFLAGS); // missing from schema (workaround)
 	        objClassBuilder.addAttributeInfo(attrKrbTicketFlagsBuilder.build());
+
+			AttributeInfoBuilder attrKrbLastAdminUnlockBuilder = new AttributeInfoBuilder(ATTR_KRBLASTADMINUNLOCK); // missing from schema (workaround)
+	        objClassBuilder.addAttributeInfo(attrKrbLastAdminUnlockBuilder.build());
 
 	        AttributeInfoBuilder attrNoPrivateBuilder = new AttributeInfoBuilder(ATTR_NOPRIVATE); // missing from schema (workaround)
 	        objClassBuilder.addAttributeInfo(attrNoPrivateBuilder.build());
