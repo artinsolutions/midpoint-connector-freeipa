@@ -106,7 +106,7 @@ public class FreeIpaConnector extends AbstractRestConnector<FreeIpaConfiguration
 	public static final String ATTR_MEMBEROF_ROLE = "memberof_role";
 	public static final String ATTR_DESCRIPTION = "description";
 	public static final String ATTR_KRBPASSWORDEXPIRATION = "krbpasswordexpiration";
-	
+
 	public static final String ATTR_IPAUNIQUEID = "ipauniqueid";
 	public static final String ATTR_MEPMANAGEDENTRY = "mepmanagedentry";
 	public static final String ATTR_OBJECTCLASS = "objectclass";
@@ -117,7 +117,8 @@ public class FreeIpaConnector extends AbstractRestConnector<FreeIpaConfiguration
 	public static final String ATTR_IPANTSECURITYIDENTIFIER = "ipantsecurityidentifier";
 	public static final String ATTR_KRBTICKETFLAGS = "krbticketflags";
 	public static final String ATTR_KRBLASTADMINUNLOCK = "krblastadminunlock";
-	
+	public static final String ATTR_KRBPWDPOLICYREFERENCE = "krbpwdpolicyreference";
+
 	public static final String ATTR_IPANTHASH = "ipanthash"; // freeradius
 	
 	
@@ -335,6 +336,10 @@ public class FreeIpaConnector extends AbstractRestConnector<FreeIpaConfiguration
 
 			AttributeInfoBuilder attrIpaNtHashBuilder = new AttributeInfoBuilder(ATTR_IPANTHASH); // missing from schema (workaround)
 	        objClassBuilder.addAttributeInfo(attrIpaNtHashBuilder.build());
+
+			AttributeInfoBuilder attrKrbPwdPolicyReference = new AttributeInfoBuilder(ATTR_KRBPWDPOLICYREFERENCE); // missing from schema (workaround)
+			objClassBuilder.addAttributeInfo(attrKrbPwdPolicyReference.build());
+
 		}
 		
 		if (OBJECT_CLASS_GROUP.equals(className)) {
