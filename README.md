@@ -33,6 +33,13 @@ After successful the build, you can find `connector-freeipa-1.0.0.0.jar` in `tar
 * set membership to user groups: ipausers, trust admins, admins 
 * inspire by [sample](https://github.com/artinsolutions/midpoint-connector-freeipa/tree/master/sample) to configure your own resource
 
+## Debugging
+
+* Verify if service account has set password never expire and not needed to change password at first log on.
+* Try to log in with created service account (user) to FreeIPA web GUI & verify if you have required permissions to create/update/delete user, create/update/delete groups & roles and his memberships.
+* Set up Logger for package "io.artin.idm.connector.freeipa" to TRACE in midpoint over System/Logging/Loggers & verify midpoint.log for error details.
+* In some cases FreeIPA missconfiguration cause to return HTML error page instead of JSON and this is showd as error message in Test Connection "org.json.JSONException(A JSONObject text must begin with '{' at 1 [character 2 line 1])"
+
 ## License
 
 Licensed under the [Apache License 2.0](/LICENSE).
