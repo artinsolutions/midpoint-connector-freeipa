@@ -897,7 +897,12 @@ public class FreeIpaConnector extends AbstractRestConnector<FreeIpaConfiguration
         		params.put(attrName, values);
     		}
     		else {
-    			params.put(attrName, attrValue.get(0));
+				if (attrValue==null) {
+					params.put(attrName, JSONObject.NULL);
+				}
+				else {
+					params.put(attrName, attrValue.get(0));
+				}
     		}
         }                
         
