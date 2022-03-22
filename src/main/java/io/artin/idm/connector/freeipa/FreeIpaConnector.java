@@ -367,9 +367,16 @@ public class FreeIpaConnector extends AbstractRestConnector<FreeIpaConfiguration
         jo.put("method", method);
 
         params_value.put("version", API_VERSION);
+        if (method.contains("_find")) {
+        	// finding users, roles, groups - workaround for paging (better way not found yet - FreeIPA GUI use sizelimit=0 :( )
+			params_value.put("sizelimit", getConfiguration().getSizelimit());
+			params_value.put("timelimit", getConfiguration().getTimelimit());
+		}
+
         JSONArray params = new JSONArray();
         params.put(params_array);
         params.put(params_value);
+
         jo.put("params", params);
 
         jo.put("id", "0"); //TODO: request ID generation?
@@ -481,7 +488,10 @@ public class FreeIpaConnector extends AbstractRestConnector<FreeIpaConfiguration
                         ConnectorObject connectorObject = convertUserToConnectorObject(user);
                         handler.handle(connectorObject);
             		}
-                	// TODO: paging if required later...
+            		if (results.length() == getConfiguration().getSizelimit()){
+            			LOG.warn("Sizelimit reached when searching all users, please increase it over resource config...");
+					}
+                	// TODO: better paging if possible later...
                 }
             }
             else if (objectClass.is(OBJECT_CLASS_ROLE)) {
@@ -500,7 +510,10 @@ public class FreeIpaConnector extends AbstractRestConnector<FreeIpaConfiguration
                         ConnectorObject connectorObject = convertRoleToConnectorObject(role);
                         handler.handle(connectorObject);
             		}
-                	// TODO: paging if required later...
+					if (results.length() == getConfiguration().getSizelimit()){
+						LOG.warn("Sizelimit reached when searching all roles, please increase it over resource config...");
+					}
+                	// TODO: better paging if possible later...
                 }
             }
             else if (objectClass.is(OBJECT_CLASS_GROUP)) {
@@ -519,7 +532,10 @@ public class FreeIpaConnector extends AbstractRestConnector<FreeIpaConfiguration
                         ConnectorObject connectorObject = convertGroupToConnectorObject(group);
                         handler.handle(connectorObject);
             		}
-                	// TODO: paging if required later...
+					if (results.length() == getConfiguration().getSizelimit()){
+						LOG.warn("Sizelimit reached when searching all groups, please increase it over resource config...");
+					}
+                	// TODO: better paging if possible later...
                 }
             }
             else {

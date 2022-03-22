@@ -16,11 +16,38 @@
 package io.artin.idm.connector.freeipa;
 
 import com.evolveum.polygon.rest.AbstractRestConfiguration;
+import org.identityconnectors.framework.spi.ConfigurationProperty;
 
 /**
  * @author gpalos
  *
  */
 public class FreeIpaConfiguration extends AbstractRestConfiguration {
+    private int sizelimit = 100;
+    private int timelimit = 2;
+
+    @ConfigurationProperty(
+            displayMessageKey = "freeipa.config.sizelimit",
+            helpMessageKey = "freeipa.config.sizelimit.help"
+    )
+    public Integer getSizelimit() {
+        return this.sizelimit;
+    }
+
+    public void setSizelimit(Integer sizelimit) {
+        this.sizelimit = sizelimit;
+    }
+
+    @ConfigurationProperty(
+            displayMessageKey = "freeipa.config.timelimit",
+            helpMessageKey = "freeipa.config.timelimit.help"
+    )
+    public Integer getTimelimit() {
+        return this.timelimit;
+    }
+
+    public void setTimelimit(Integer timelimit) {
+        this.timelimit = timelimit;
+    }
 
 }
