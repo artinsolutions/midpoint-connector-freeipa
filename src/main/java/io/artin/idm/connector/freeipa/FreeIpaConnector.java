@@ -120,8 +120,7 @@ public class FreeIpaConnector extends AbstractRestConnector<FreeIpaConfiguration
 	public static final String ATTR_KRBPWDPOLICYREFERENCE = "krbpwdpolicyreference";
 
 	public static final String ATTR_IPANTHASH = "ipanthash"; // freeradius
-	
-	
+	public static final String ATTR_IPANTHOMEDIRECTORYDRIVE = "ipanthomedirectorydrive";
 
     public static String COOKIE_VALUE = null;
 
@@ -336,6 +335,9 @@ public class FreeIpaConnector extends AbstractRestConnector<FreeIpaConfiguration
 
 			AttributeInfoBuilder attrIpaNtHashBuilder = new AttributeInfoBuilder(ATTR_IPANTHASH); // missing from schema (workaround)
 	        objClassBuilder.addAttributeInfo(attrIpaNtHashBuilder.build());
+
+			AttributeInfoBuilder attrIpaNtHomeDirectoryDrive = new AttributeInfoBuilder(ATTR_IPANTHOMEDIRECTORYDRIVE); // missing from schema (workaround)
+			objClassBuilder.addAttributeInfo(attrIpaNtHomeDirectoryDrive.build());
 
 			AttributeInfoBuilder attrKrbPwdPolicyReference = new AttributeInfoBuilder(ATTR_KRBPWDPOLICYREFERENCE); // missing from schema (workaround)
 			objClassBuilder.addAttributeInfo(attrKrbPwdPolicyReference.build());
