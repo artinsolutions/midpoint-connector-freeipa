@@ -260,6 +260,7 @@ public class FreeIpaConnector extends AbstractRestConnector<FreeIpaConfiguration
 
         // UID & NAME are defaults
 		JSONArray classes = FreeIpaConnector.schema.getJSONObject("result").getJSONObject("result").getJSONArray("classes");
+		boolean ipaNtHomeDirectoryAlreadyFound = false;
 		for (int i = 0; i < classes.length(); ++i) {
 		    JSONObject jsonClass = classes.getJSONObject(i);
 		    String jsonClassName = jsonClass.getString("name");
@@ -285,6 +286,8 @@ public class FreeIpaConnector extends AbstractRestConnector<FreeIpaConfiguration
 		    			attrBuilder.setMultiValued(true); 
 
 		            objClassBuilder.addAttributeInfo(attrBuilder.build());
+		            if (ATTR_IPANTHOMEDIRECTORYDRIVE.equals(attributeName))
+						ipaNtHomeDirectoryAlreadyFound = true;
 		    	}
 		    }
 		}
@@ -336,8 +339,10 @@ public class FreeIpaConnector extends AbstractRestConnector<FreeIpaConfiguration
 			AttributeInfoBuilder attrIpaNtHashBuilder = new AttributeInfoBuilder(ATTR_IPANTHASH); // missing from schema (workaround)
 	        objClassBuilder.addAttributeInfo(attrIpaNtHashBuilder.build());
 
-			AttributeInfoBuilder attrIpaNtHomeDirectoryDrive = new AttributeInfoBuilder(ATTR_IPANTHOMEDIRECTORYDRIVE); // missing from schema (workaround)
-			objClassBuilder.addAttributeInfo(attrIpaNtHomeDirectoryDrive.build());
+	        if (!ipaNtHomeDirectoryAlreadyFound) {
+				AttributeInfoBuilder attrIpaNtHomeDirectoryDrive = new AttributeInfoBuilder(ATTR_IPANTHOMEDIRECTORYDRIVE); // missing from schema (workaround)
+				objClassBuilder.addAttributeInfo(attrIpaNtHomeDirectoryDrive.build());
+			}
 
 			AttributeInfoBuilder attrKrbPwdPolicyReference = new AttributeInfoBuilder(ATTR_KRBPWDPOLICYREFERENCE); // missing from schema (workaround)
 			objClassBuilder.addAttributeInfo(attrKrbPwdPolicyReference.build());
